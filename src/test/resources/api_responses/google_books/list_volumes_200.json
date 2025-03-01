@@ -1,0 +1,374 @@
+{
+  "kind": "books#volumes",
+  "totalItems": 665,
+  "items": [
+    {
+      "kind": "books#volume",
+      "id": "35VcAAAAMAAJ",
+      "etag": "QnU8q6/sgSw",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/35VcAAAAMAAJ",
+      "volumeInfo": {
+        "title": "The Stranger",
+        "authors": [
+          "Albert Camus"
+        ],
+        "publisher": "Knopf",
+        "publishedDate": "1988",
+        "description": "Caught in the grip of forces he does not understand, a quiet, ordinary clerk in Algiers commits a murder.",
+        "industryIdentifiers": [
+          {
+            "type": "OTHER",
+            "identifier": "UOM:39015038892215"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": false
+        },
+        "pageCount": 148,
+        "printType": "BOOK",
+        "categories": [
+          "Fiction"
+        ],
+        "averageRating": 4,
+        "ratingsCount": 2,
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "1.5.5.0.preview.0",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=35VcAAAAMAAJ&printsec=frontcover&img=1&zoom=5&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=35VcAAAAMAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api"
+        },
+        "language": "en",
+        "previewLink": "http://books.google.ro/books?id=35VcAAAAMAAJ&q=intitle:The+Stranger&dq=intitle:The+Stranger&hl=&cd=1&source=gbs_api",
+        "infoLink": "http://books.google.ro/books?id=35VcAAAAMAAJ&dq=intitle:The+Stranger&hl=&source=gbs_api",
+        "canonicalVolumeLink": "https://books.google.com/books/about/The_Stranger.html?hl=&id=35VcAAAAMAAJ"
+      },
+      "saleInfo": {
+        "country": "RO",
+        "saleability": "NOT_FOR_SALE",
+        "isEbook": false
+      },
+      "accessInfo": {
+        "country": "RO",
+        "viewability": "NO_PAGES",
+        "embeddable": false,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false
+        },
+        "pdf": {
+          "isAvailable": false
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=35VcAAAAMAAJ&hl=&source=gbs_api",
+        "accessViewStatus": "NONE",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "Caught in the grip of forces he does not understand, a quiet, ordinary clerk in Algiers commits a murder."
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "YCvowAEACAAJ",
+      "etag": "u1aLPD3NNvU",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/YCvowAEACAAJ",
+      "volumeInfo": {
+        "title": "The Stranger",
+        "subtitle": "A Play in Five Acts",
+        "authors": [
+          "Augustus von Kotzebue"
+        ],
+        "publishedDate": "1875",
+        "industryIdentifiers": [
+          {
+            "type": "OTHER",
+            "identifier": "OCLC:15502767"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": false
+        },
+        "pageCount": 32,
+        "printType": "BOOK",
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "preview-1.0.0",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "language": "en",
+        "previewLink": "http://books.google.ro/books?id=YCvowAEACAAJ&dq=intitle:The+Stranger&hl=&cd=2&source=gbs_api",
+        "infoLink": "http://books.google.ro/books?id=YCvowAEACAAJ&dq=intitle:The+Stranger&hl=&source=gbs_api",
+        "canonicalVolumeLink": "https://books.google.com/books/about/The_Stranger.html?hl=&id=YCvowAEACAAJ"
+      },
+      "saleInfo": {
+        "country": "RO",
+        "saleability": "NOT_FOR_SALE",
+        "isEbook": false
+      },
+      "accessInfo": {
+        "country": "RO",
+        "viewability": "NO_PAGES",
+        "embeddable": false,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false
+        },
+        "pdf": {
+          "isAvailable": false
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=YCvowAEACAAJ&hl=&source=gbs_api",
+        "accessViewStatus": "NONE",
+        "quoteSharingAllowed": false
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "apV1RAAACAAJ",
+      "etag": "dh+M54B2nbU",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/apV1RAAACAAJ",
+      "volumeInfo": {
+        "title": "The Black Cat",
+        "authors": [
+          "Colin Campbell",
+          "John Milne",
+          "Norman Whitney"
+        ],
+        "publishedDate": "2002",
+        "description": "While Tom is at work in London, his wife Marina is left bored and alone in the small village where they live. She wishes for someone to do the housework for her and a strange thing happens. Her wish comes true; the Ironing Man enters her life, and everything begins to change for both Marina and Tom.",
+        "industryIdentifiers": [
+          {
+            "type": "ISBN_10",
+            "identifier": "9001559557"
+          },
+          {
+            "type": "ISBN_13",
+            "identifier": "9789001559557"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": false
+        },
+        "pageCount": 56,
+        "printType": "BOOK",
+        "categories": [
+          "Couples"
+        ],
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "preview-1.0.0",
+        "language": "en",
+        "previewLink": "http://books.google.ro/books?id=apV1RAAACAAJ&dq=intitle:The+Stranger&hl=&cd=3&source=gbs_api",
+        "infoLink": "http://books.google.ro/books?id=apV1RAAACAAJ&dq=intitle:The+Stranger&hl=&source=gbs_api",
+        "canonicalVolumeLink": "https://books.google.com/books/about/The_Black_Cat.html?hl=&id=apV1RAAACAAJ"
+      },
+      "saleInfo": {
+        "country": "RO",
+        "saleability": "NOT_FOR_SALE",
+        "isEbook": false
+      },
+      "accessInfo": {
+        "country": "RO",
+        "viewability": "NO_PAGES",
+        "embeddable": false,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false
+        },
+        "pdf": {
+          "isAvailable": false
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=apV1RAAACAAJ&hl=&source=gbs_api",
+        "accessViewStatus": "NONE",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "While Tom is at work in London, his wife Marina is left bored and alone in the small village where they live."
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "02GwNwAACAAJ",
+      "etag": "8GEL0NCSxIo",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/02GwNwAACAAJ",
+      "volumeInfo": {
+        "title": "The Stranger",
+        "authors": [
+          "Max Frei"
+        ],
+        "publisher": "Harry N. Abrams",
+        "publishedDate": "2009-04-02",
+        "description": "The millions-selling fantasy epic of the new Russian literary icon-a freeloading freebooter who finds a new home in a magical world",
+        "industryIdentifiers": [
+          {
+            "type": "ISBN_10",
+            "identifier": "1590200659"
+          },
+          {
+            "type": "ISBN_13",
+            "identifier": "9781590200650"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": false
+        },
+        "pageCount": 0,
+        "printType": "BOOK",
+        "categories": [
+          "Fiction"
+        ],
+        "averageRating": 4.5,
+        "ratingsCount": 2,
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "preview-1.0.0",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=02GwNwAACAAJ&printsec=frontcover&img=1&zoom=5&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=02GwNwAACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api"
+        },
+        "language": "en",
+        "previewLink": "http://books.google.ro/books?id=02GwNwAACAAJ&dq=intitle:The+Stranger&hl=&cd=4&source=gbs_api",
+        "infoLink": "http://books.google.ro/books?id=02GwNwAACAAJ&dq=intitle:The+Stranger&hl=&source=gbs_api",
+        "canonicalVolumeLink": "https://books.google.com/books/about/The_Stranger.html?hl=&id=02GwNwAACAAJ"
+      },
+      "saleInfo": {
+        "country": "RO",
+        "saleability": "NOT_FOR_SALE",
+        "isEbook": false
+      },
+      "accessInfo": {
+        "country": "RO",
+        "viewability": "NO_PAGES",
+        "embeddable": false,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false
+        },
+        "pdf": {
+          "isAvailable": false
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=02GwNwAACAAJ&hl=&source=gbs_api",
+        "accessViewStatus": "NONE",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "A literary sensation in Russia and presented in English for the first time, &quot;The Stranger&quot;--part fantasy, part horror, part philosophy--is united by a sharp wit and a web of clues to challenge the reader&#39;s imagination."
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "THeOBAAAQBAJ",
+      "etag": "B5JbfzPXqCs",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/THeOBAAAQBAJ",
+      "volumeInfo": {
+        "title": "The Stranger",
+        "authors": [
+          "Harlan Coben"
+        ],
+        "publisher": "Penguin",
+        "publishedDate": "2015-03-24",
+        "description": "NOW A NETFLIX ORIGINAL SERIES! A secret destroys a man’s perfect life and sends him on a collision course with a deadly conspiracy in this shocking thriller from #1 New York Times bestselling author Harlan Coben. The Stranger appears out of nowhere, perhaps in a bar, or a parking lot, or at the grocery store. Their identity is unknown. Their motives are unclear. Their information is undeniable. Then they whisper a few words in your ear and disappear, leaving you picking up the pieces of your shattered world... Adam Price has a lot to lose: a comfortable marriage to a beautiful woman, two wonderful sons, and all the trappings of the American Dream: a big house, a good job, a seemingly perfect life. Then he runs into the Stranger. When he learns a devastating secret about his wife, Corinne, he confronts her, and the mirage of perfection disappears as if it never existed at all. Soon Adam finds himself tangled in something far darker than even Corinne's deception, and realizes that if he doesn't make exactly the right moves, the conspiracy he’s stumbled into will not only ruin lives—it will end them.",
+        "industryIdentifiers": [
+          {
+            "type": "ISBN_13",
+            "identifier": "9780698186200"
+          },
+          {
+            "type": "ISBN_10",
+            "identifier": "0698186206"
+          }
+        ],
+        "readingModes": {
+          "text": true,
+          "image": false
+        },
+        "pageCount": 259,
+        "printType": "BOOK",
+        "categories": [
+          "Fiction"
+        ],
+        "averageRating": 4,
+        "ratingsCount": 1,
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": true,
+        "contentVersion": "1.6.7.0.preview.2",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=THeOBAAAQBAJ&printsec=frontcover&img=1&zoom=5&edge=curl&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=THeOBAAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+        },
+        "language": "en",
+        "previewLink": "http://books.google.ro/books?id=THeOBAAAQBAJ&printsec=frontcover&dq=intitle:The+Stranger&hl=&cd=5&source=gbs_api",
+        "infoLink": "https://play.google.com/store/books/details?id=THeOBAAAQBAJ&source=gbs_api",
+        "canonicalVolumeLink": "https://play.google.com/store/books/details?id=THeOBAAAQBAJ"
+      },
+      "saleInfo": {
+        "country": "RO",
+        "saleability": "FOR_SALE",
+        "isEbook": true,
+        "listPrice": {
+          "amount": 42.9,
+          "currencyCode": "RON"
+        },
+        "retailPrice": {
+          "amount": 42.9,
+          "currencyCode": "RON"
+        },
+        "buyLink": "https://play.google.com/store/books/details?id=THeOBAAAQBAJ&rdid=book-THeOBAAAQBAJ&rdot=1&source=gbs_api",
+        "offers": [
+          {
+            "finskyOfferType": 1,
+            "listPrice": {
+              "amountInMicros": 42900000,
+              "currencyCode": "RON"
+            },
+            "retailPrice": {
+              "amountInMicros": 42900000,
+              "currencyCode": "RON"
+            }
+          }
+        ]
+      },
+      "accessInfo": {
+        "country": "RO",
+        "viewability": "PARTIAL",
+        "embeddable": true,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": true,
+          "acsTokenLink": "http://books.google.ro/books/download/The_Stranger-sample-epub.acsm?id=THeOBAAAQBAJ&format=epub&output=acs4_fulfillment_token&dl_type=sample&source=gbs_api"
+        },
+        "pdf": {
+          "isAvailable": false
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=THeOBAAAQBAJ&hl=&source=gbs_api",
+        "accessViewStatus": "SAMPLE",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "NOW A NETFLIX ORIGINAL SERIES! A secret destroys a man’s perfect life and sends him on a collision course with a deadly conspiracy in this shocking thriller from #1 New York Times bestselling author Harlan Coben."
+      }
+    }
+  ]
+}

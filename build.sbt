@@ -8,18 +8,17 @@ logLevel     := Level.Info
 lazy val root = (project in file("."))
   .enablePlugins(ScalaNativePlugin)
   .settings(
+    Compile / mainClass := Some(s"com.github.alinski.MetakulturApp"),
     scalafmtOnCompile := true,
-    scalacOptions ++= Seq("-Wunused:imports", "-Wunused:locals", "-Wunused:params", "-Wunused:linted"),
+    scalacOptions ++= Seq("-explain", "-Wunused:imports", "-Wunused:locals", "-Wunused:params", "-Wunused:linted"),
     libraryDependencies ++= Seq(
       "com.github.alexarchambault"    %% "case-app_native0.5"        % "2.1.0-M30",
       "com.lihaoyi"                   %% "os-lib_native0.5"          % "0.11.4",
-      "io.circe"                      %% "circe-core_native0.5"      % "0.14.10",
-      "io.circe"                      %% "circe-generic_native0.5"   % "0.14.10",
-      "io.circe"                      %% "circe-parser_native0.5"    % "0.14.10",
+      "com.lihaoyi"                   %% "fastparse_native0.5"       % "3.1.1",
+      "com.lihaoyi"                   %% "upickle_native0.5"         % "4.1.0",
       "com.outr"                      %% "scribe_native0.5"          % "3.16.0",
       "io.github.cquiroz"             %% "scala-java-time_native0.5" % "2.6.0",
       "com.softwaremill.sttp.client4" %% "core_native0.5"            % "4.0.0-RC1",
-      "com.softwaremill.sttp.client4" %% "circe_native0.5"           % "4.0.0-RC1",
       "org.scalameta"                 %% "munit_native0.5"           % "1.1.0" % Test
     )
   )

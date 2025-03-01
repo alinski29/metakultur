@@ -1,0 +1,78 @@
+{
+  "page": 1,
+  "results": [
+    {
+      "adult": false,
+      "backdrop_path": "/h7r6LZ32dgLwtwSW3CxoWIYD9pr.jpg",
+      "genre_ids": [
+        14,
+        27
+      ],
+      "id": 426063,
+      "original_language": "en",
+      "original_title": "Nosferatu",
+      "overview": "A gothic tale of obsession between a haunted young woman and the terrifying vampire infatuated with her, causing untold horror in its wake.",
+      "popularity": 353.462,
+      "poster_path": "/5qGIxdEO841C0tdY8vOdLoRVrr0.jpg",
+      "release_date": "2024-12-25",
+      "title": "Nosferatu",
+      "video": false,
+      "vote_average": 6.7,
+      "vote_count": 2233
+    },
+    {
+      "adult": false,
+      "backdrop_path": "/ugDZGeweSN9EH8XrLaBHLm5AxuA.jpg",
+      "genre_ids": [
+        18,
+        27
+      ],
+      "id": 6404,
+      "original_language": "de",
+      "original_title": "Nosferatu - Phantom der Nacht",
+      "overview": "A real estate agent leaves behind his beautiful wife to go to Transylvania to visit the mysterious Count Dracula and formalize the purchase of a property in Wismar.",
+      "popularity": 16.45,
+      "poster_path": "/jHKzGYwf7P34vz8MhJBTN6cnaYD.jpg",
+      "release_date": "1979-01-17",
+      "title": "Nosferatu the Vampyre",
+      "video": false,
+      "vote_average": 7.3,
+      "vote_count": 962
+    },
+    {
+      "adult": false,
+      "backdrop_path": null,
+      "genre_ids": [],
+      "id": 1428364,
+      "original_language": "en",
+      "original_title": "Nosferatu",
+      "overview": "An experimental short film which aired on MTV and PBS",
+      "popularity": 0.207,
+      "poster_path": "/bJrEOWIAkv59HSzY9N6gWxW2RAg.jpg",
+      "release_date": "1991-01-01",
+      "title": "Nosferatu",
+      "video": false,
+      "vote_average": 0,
+      "vote_count": 0
+    },
+    {
+      "adult": false,
+      "backdrop_path": "/u06SympEEMb7pLhR9W3tvydHT9L.jpg",
+      "genre_ids": [
+        27,
+        14
+      ],
+      "id": 653,
+      "original_language": "de",
+      "original_title": "Nosferatu, eine Symphonie des Grauens",
+      "overview": "The mysterious Count Orlok summons Thomas Hutter to his remote Transylvanian castle in the mountains. The eerie Orlok seeks to buy a house near Hutter and his wife, Ellen. After Orlok reveals his vampire nature, Hutter struggles to escape the castle, knowing that Ellen is in grave danger. Meanwhile Orlok's servant, Knock, prepares for his master to arrive at his new home.",
+      "popularity": 38.431,
+      "poster_path": "/zv7J85D8CC9qYagAEhPM63CIG6j.jpg",
+      "release_date": "1922-02-16",
+      "title": "Nosferatu",
+      "video": false,
+      "vote_average": 7.668,
+      "vote_count": 2194
+    }
+  ]
+}
