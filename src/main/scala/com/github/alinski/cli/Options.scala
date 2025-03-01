@@ -11,10 +11,13 @@ case class BookOptions(
     title: Option[String] = None,
     @Name("author")
     author: Option[String] = None,
+    @Name("f")
     @Name("output-format")
     outputFormat: Option[String] = None,
+    @Name("o")
     @Name("output-file")
     outputFile: Option[String] = None,
+    @Name("n")
     @Name("limit")
     limit: Int = 5
 )
@@ -24,10 +27,13 @@ case class VisualMediaOptions(
     id: Option[String] = None,
     @Name("imdb-csv-file")
     imdbCSVFile: Option[String] = None,
+    @Name("f")
     @Name("output-format")
     outputFormat: Option[String] = None,
+    @Name("o")
     @Name("output-file")
     outputFile: Option[String] = None,
+    @Name("n")
     @Name("limit")
     limit: Int = 5
 )
