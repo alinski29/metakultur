@@ -78,7 +78,7 @@ object TvSeriesApiServiceSpec:
 
       id match
         case `tvSeriesImdbId` =>
-          val json = ujson.read(os.read(apiResponsesPath / "find_by_id_tvseries_200.json"))
+          val json = ujson.read(os.read(apiResponsesPath / "get_by_imdb_id_200.json"))
           Right(Response.ok(json, getRequestMeta(tvSeriesImdbId)))
         // emtpy response
         case _ =>
@@ -95,7 +95,7 @@ object TvSeriesApiServiceSpec:
 
       id match
         case id if id == tvSeriesTmdbId =>
-          val json = ujson.read(os.read(apiResponsesPath / "details_tvseries_200.json"))
+          val json = ujson.read(os.read(apiResponsesPath / "get_by_tmdb_id_200.json"))
           Right(Response.ok(json, getRequestMeta(tvSeriesTmdbId)))
         case id =>
           Left(Response("Not found", StatusCode(404), getRequestMeta(id)))
@@ -114,7 +114,7 @@ object TvSeriesApiServiceSpec:
 
       query match
         case q if q == "The Last of Us" =>
-          val json = ujson.read(os.read(apiResponsesPath / "search_tvseries_200.json"))
+          val json = ujson.read(os.read(apiResponsesPath / "search_200.json"))
           Right(Response.ok(json, getRequestMeta(query)))
         case q if q == "empty" =>
           val json = ujson.read("""{"page":1,"results":[],"total_pages":1,"total_results":0}""")
