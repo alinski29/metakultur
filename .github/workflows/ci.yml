@@ -39,7 +39,7 @@ jobs:
           ${{ runner.os }}-sbt-
 
     - name: Format Check
-      run: sbt scalaFmtCheck
+      run: sbt scalafmtCheck
 
     - name: Run Tests
       run: sbt clean test
