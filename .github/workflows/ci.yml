@@ -1,0 +1,45 @@
+name: CI
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  ci:
+    name: CI
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Setup Java
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'adopt'
+        java-version: '17'
+        cache: sbt
+
+    - name: Setup sbt launcher
+      uses: sbt/setup-sbt@v1
+      with:
+        sbt-runner-version: 1.10.6
+
+    - name: Cache SBT Dependencies
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.ivy2/cache
+          ~/.sbt
+        key: ${{ runner.os }}-sbt-${{ hashFiles('**/build.sbt') }}
+        restore-keys: |
+          ${{ runner.os }}-sbt-
+
+    - name: Format Check
+      run: sbt scalaFmtCheck
+
+    - name: Run Tests
+      run: sbt clean test
