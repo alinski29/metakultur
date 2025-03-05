@@ -5,8 +5,25 @@ import com.github.alinski.model.{VisualMedia, VisualMediaGenre, VisualMediaType}
 
 import scala.concurrent.duration.Duration
 import scala.util.Try
+import java.time.LocalDate
 
 object ImdbCsvReaderService extends CsvReader[VisualMedia]:
+
+  def read(
+      path: os.Path,
+      from: Option[LocalDate] = None,
+      to: Option[LocalDate] = None
+  ): Either[Throwable, LazyList[VisualMedia]] =
+    def getDate(x: VisualMedia): LocalDate =
+      x.dateRated.orElse(x.dateAdded).getOrElse(LocalDate.now())
+
+    super.read(path).map { lines =>
+      (from, to) match
+        case (None, None)           => lines
+        case (Some(from), None)     => lines.filterNot(x => getDate(x).isBefore(from))
+        case (None, Some(to))       => lines.filterNot(x => getDate(x).isAfter(to))
+        case (Some(from), Some(to)) => lines.filterNot(x => getDate(x).isBefore(from) || getDate(x).isAfter(to))
+    }
 
   def parse(line: Seq[String], header: Map[String, Int]): Either[Exception, VisualMedia] =
     val getRow = (cols: Seq[String], name: String) =>
@@ -30,6 +47,7 @@ object ImdbCsvReaderService extends CsvReader[VisualMedia]:
         runtime = getRow(line, "Runtime (mins)").map(x => Duration(x + " minutes")),
         year = getRow(line, "Year"),
         dateReleased = getRow(line, "Release Date").map(x => java.time.LocalDate.parse(x)),
+        dateRated = getRow(line, "Date Rated").map(x => java.time.LocalDate.parse(x)),
         genres =
           getRow(line, "Genres").map(x => x.split(",").toList.flatMap(g => VisualMediaGenre.fromString(g.trim))),
         directors = getRow(line, "Directors").map(x => x.split(",").map(_.trim).toList).getOrElse(List()),

@@ -1,13 +1,15 @@
 package com.github.alinski.cli
 
 import caseapp.*
+import com.github.alinski.cli.Helpers.*
 import com.github.alinski.io.{FileWriter, WriteOptions}
-import com.github.alinski.model.Book
+import com.github.alinski.model.{Book, ReadState}
 import com.github.alinski.serde.Serializer.MarkdownTable
-import com.github.alinski.serde.{FileFormat, Serializer}
-import com.github.alinski.service.BookApiService
+import com.github.alinski.serde.Serializer
+import com.github.alinski.service.{BookApiService, GoodreadsCsvReaderService}
 
 import scala.annotation.tailrec
+import java.time.LocalDate
 
 object BookCommand extends Command[BookOptions]:
   lazy val bookService = BookApiService()
@@ -20,30 +22,67 @@ object BookCommand extends Command[BookOptions]:
       case (Some(isbn), _) =>
         bookService.getByIsbn(isbn).map(LazyList(_))
       case (_, Some(filePath)) =>
-        Left(IllegalArgumentException("Goodreads CSV import not implemented yet"))
+        GoodreadsCsvReaderService
+          .read(os.Path(filePath), options.shared.from.flatMap(parseDate), options.shared.to.flatMap(parseDate))
+          .map(books => if options.shared.enrich then enrichBooks(bookService, books) else books)
       case _ =>
         buildSearchQuery(options, args) match
-          case Some(query) => userPromptInteraction(bookService, query, options.limit).map(LazyList(_))
+          case Some(query) =>
+            userPromptInteraction(bookService, query, options.shared.limit).map(LazyList(_))
           case None =>
             Left(IllegalArgumentException("No id, file or search query provided. At least one is required"))
 
-    val format          = resolveOutputFormat(options.outputFormat, options.outputFile)
-    val booksSerialized = maybeBooks.map(_.map(Serializer.serialize(_, format)))
+    // Apply user preferences if rate option is enabled and we have a direct ISBN lookup
+    val maybeBooksWithPreferences =
+      if options.shared.rate && maybeBooks.map(_.size).getOrElse(0) == 1
+      then maybeBooks.map(_.map(collectUserPreferences))
+      else maybeBooks
 
-    options.outputFile.map(os.Path(_)) match
+    maybeBooksWithPreferences match
+      case Left(err) if err.getMessage.contains("No items found") || err.getMessage.contains("Empty items") =>
+        println(s"No book found for isbn: ${options.isbn.getOrElse("")}")
+        sys.exit(0)
+      case Left(err) =>
+        throw err
+      case Right(books) if books.isEmpty && options.isbn.nonEmpty =>
+        println(s"No book found for isbn: ${options.isbn.getOrElse("")}")
+        sys.exit(0)
+      case Right(books) => ()
+
+    val writeOpts = WriteOptions.default
+    val maybePath = options.shared.output.map(os.Path(_))
+    maybePath.foreach { path =>
+      if !path.toIO.exists() && writeOpts.makeDirs
+      then os.makeDir.all(path)
+      else if !path.toIO.exists() && !writeOpts.makeDirs then
+        throw IllegalArgumentException(s"Path $path does not exist and makeDirs is set to false")
+    }
+
+    val books  = maybeBooksWithPreferences.getOrElse(LazyList.empty[Book])
+    val format = resolveOutputFormat(options.shared.outputFormat, options.shared.output)
+
+    maybePath match
       case None =>
-        booksSerialized match
-          case Right(books) => books.foreach(println)
-          case Left(err) if err.getMessage.contains("No items found") || err.getMessage.contains("Empty items") =>
-            println(s"No books found for isbn: ${options.isbn.getOrElse("")}")
+        books.foreach(book => println(Serializer.serialize(book, format)))
+      case Some(path) if path.ext.isBlank =>
+        books.foreach { book =>
+          val filePath = path / createValidFileName(book.title, format.toString)
+          val output   = Serializer.serialize(book, format)
+          FileWriter.write(LazyList(output), filePath, writeOpts) match
+            case Right(file) =>
+              scribe.info(s"Written to $file")
+            case Left(err) =>
+              scribe.error(s"Failed to write book to ${filePath}, error: ${err.getMessage}")
+              throw err
+        }
       case Some(path) =>
-        val result = for
-          books <- booksSerialized
-          file  <- FileWriter.write(books, path, WriteOptions.default, Some(format))
-        yield file
-        result match
-          case Right(file) => scribe.info(s"Books written to $file")
-          case Left(e)     => throw e
+        val output = books.map(Serializer.serialize(_, format))
+        FileWriter.write(output, path, writeOpts) match
+          case Right(file) =>
+            scribe.info(s"Written to $file")
+          case Left(err) =>
+            scribe.error(s"Failed to write books to file $path, error: ${err.getMessage}")
+            throw err
 
   private def buildSearchQuery(options: BookOptions, args: RemainingArgs): Option[String] =
     (options.title, options.author, args.all.nonEmpty) match
@@ -62,15 +101,13 @@ object BookCommand extends Command[BookOptions]:
   private def userPromptInteraction(
       service: BookApiService,
       query: String,
-      limit: Int
+      limit: Int,
   ): Either[Exception, Book] =
     service.search(query, limit) match
-      case Left(err) => Left(err)
-      case Right(books) if books.nonEmpty =>
-        val selection = promptUserToSelectBook(books)
-        selection
+      case Left(err)                      => Left(err)
+      case Right(books) if books.nonEmpty => promptUserToSelectBook(books)
       case Right(books) =>
-        println(s"No results found for your search query: '$query'. Enter a new query")
+        println(s"No results found for your search query: '$query'. Enter a new query or press Ctrl+C to exit")
         val newQuery = scala.io.StdIn.readLine()
         userPromptInteraction(service, newQuery, limit)
 
@@ -81,20 +118,14 @@ object BookCommand extends Command[BookOptions]:
     val maxLength = 60
     val headers   = Seq("Index", "Title", "Author(s)", "Year", "Pages", "Publisher", "ISBN")
     val rows = books.zipWithIndex.map { case (book, index) =>
-      val authors   = book.authors.mkString(", ")
-      val year      = book.publishedDate.map(_.getYear.toString).getOrElse("N/A")
-      val pages     = book.pageCount.map(_.toString).getOrElse("N/A")
-      val isbn      = book.isbn13.orElse(book.isbn10).getOrElse("N/A")
-      val publisher = book.publisher.getOrElse("N/A")
-
       Seq(
         (index + 1).toString,
         book.title.take(maxLength),
-        authors.take(maxLength),
-        year,
-        pages,
-        publisher,
-        isbn
+        book.author.take(maxLength),
+        book.yearPublished.getOrElse("N/A"),
+        book.pageCount.map(_.toString).getOrElse("N/A"),
+        book.publisher.getOrElse("N/A"),
+        book.isbn13.orElse(book.isbn10).getOrElse("N/A")
       )
     }
 
@@ -105,8 +136,78 @@ object BookCommand extends Command[BookOptions]:
     if selectedIndex < 0 || selectedIndex >= books.size then Left(Exception("Invalid selection"))
     else Right(books(selectedIndex))
 
-  private def resolveOutputFormat(outputFormat: Option[String], outputFile: Option[String]): FileFormat =
-    outputFormat
-      .map(FileFormat(_))
-      .orElse(outputFile.map(FileFormat(_)))
-      .getOrElse(FileFormat.Json)
+  private def collectUserPreferences(book: Book): Book =
+    println(s"What's the reading status of ${book.title} by ${book.author}?")
+    println("1. I've read it already")
+    println("2. Currently reading")
+    println("3. I want to read it (wishlist)")
+
+    val statusChoice = scala.io.StdIn.readInt()
+    val readStatus = statusChoice match
+      case 1 => ReadState.Read
+      case 2 => ReadState.CurrentlyReading
+      case 3 => ReadState.Wishlist
+      case _ =>
+        println("Invalid choice, defaulting to wishlist")
+        ReadState.Wishlist
+
+    val (dateRead, personalRating) = if readStatus == ReadState.Read then
+      println("When have you finished reading this book? Enter a date in format yyyy-MM-dd or leave blank.")
+      val dateStr = scala.io.StdIn.readLine().trim
+      val date =
+        if dateStr.isEmpty then None
+        else
+          try Some(LocalDate.parse(dateStr))
+          catch
+            case _: Exception =>
+              println("Invalid date format, using today's date")
+              Some(LocalDate.now())
+
+      println("Rate this book on a scale from 1 to 5")
+      val rating =
+        try
+          val r = scala.io.StdIn.readInt()
+          if r < 1 || r > 5 then
+            println(s"Invalid rating: $r not between 1 and 5, no rating set")
+            None
+          else Some(r)
+        catch
+          case err: Exception =>
+            println(s"Some error occured, can't set rating: ${err.getMessage}")
+            None
+
+      (date, rating)
+    else (None, None)
+
+    book.copy(
+      readStatus = Some(readStatus),
+      dateRead = dateRead,
+      dateRated = if personalRating.isDefined then Some(LocalDate.now()) else None,
+      personalRating = personalRating
+    )
+
+  private def enrichBooks(service: BookApiService, books: LazyList[Book]): LazyList[Book] =
+    books.map { book =>
+      book.isbn13.orElse(book.isbn10) match
+        case None => book
+        case Some(isbn) =>
+          service.getByIsbn(isbn) match
+            case Right(bookEnriched) =>
+              book.copy(
+                googleId = bookEnriched.googleId,
+                description = bookEnriched.description,
+                publishedDate = bookEnriched.publishedDate,
+                language = bookEnriched.language,
+                categories = bookEnriched.categories,
+                thumbnail = bookEnriched.thumbnail,
+                selfLink = bookEnriched.selfLink,
+                previewLink = bookEnriched.previewLink,
+                infoLink = bookEnriched.infoLink,
+                pageCount = book.pageCount.orElse(bookEnriched.pageCount),
+                publisher = book.publisher.orElse(bookEnriched.publisher),
+                yearPublished = book.yearPublished.orElse(bookEnriched.yearPublished)
+              )
+            case Left(err) =>
+              scribe.warn(s"Failed to fetch extra information for book: $isbn, title: ${book.title}")
+              book
+    }

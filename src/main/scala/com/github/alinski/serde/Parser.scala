@@ -8,24 +8,28 @@ trait Parser[A]:
   def parse(input: String): Either[String, A]
 
 object Parser:
-  def apply(format: FileFormat): Parser[_] =
+  def apply(format: FileFormat): Option[Parser[_]] =
     format match
-      case FileFormat.Json => JsonParser
-      case FileFormat.Csv  => CSVParser
+      case FileFormat.Json => Some(JsonParser)
+      case FileFormat.Csv  => Some(CSVParser)
+      case _               => None
 
   def parse(input: String, format: FileFormat): Either[String, _] =
-    apply(format).parse(input)
+    apply(format) match
+      case Some(parser) => parser.parse(input)
+      case None         => Left(s"Unsupported format: $format")
 
 object CSVParser extends Parser[Seq[String]]:
 
   def quotedField[$: P]: P[String] =
-    P("\"" ~~ CharsWhile(c => c != '\"').! ~~ "\"")
+    P("\"" ~~ (CharsWhile(c => c != '\"').! | "\"\"".map(_ => "\"")).rep.map(_.mkString) ~~ "\"")
 
   def unquotedField[$: P]: P[String] =
     P(CharsWhile(c => c != ',' && c != '\n' && c != '\"').!)
 
   def field[$: P]: P[String] =
-    P(quotedField | unquotedField)
+    // P(quotedField | unquotedField)
+    P(quotedField | unquotedField | Pass(""))
 
   def row[$: P]: P[Seq[String]] =
     P(field.rep(sep = ","))

@@ -90,16 +90,10 @@ case class BookApiService(
     try
       val volumeInfo = bookJson.obj("volumeInfo").obj
 
-      // Extract ISBNs
       val industryIdentifiers = volumeInfo.get("industryIdentifiers").map(_.arr).getOrElse(Seq.empty)
       val isbn10 = industryIdentifiers.find(id => id.obj("type").str == "ISBN_10").map(_.obj("identifier").str)
       val isbn13 = industryIdentifiers.find(id => id.obj("type").str == "ISBN_13").map(_.obj("identifier").str)
 
-      // Extract image links
-      val imageLinksMap =
-        volumeInfo.get("imageLinks").map(links => links.obj.map { case (key, value) => key -> value.str }.toMap)
-
-      // Parse date
       val dateStr = volumeInfo.get("publishedDate").map(_.str)
       val publishedDate = dateStr.flatMap(str =>
         try
@@ -112,23 +106,29 @@ case class BookApiService(
         catch case _: Exception => None
       )
 
+      val authors = volumeInfo.get("authors").map(_.arr.map(_.str).toList).getOrElse(List.empty)
+
       val book = Book(
-        googleId = bookJson.obj("id").str,
+        isbn13 = isbn13,
+        isbn10 = isbn10,
+        googleId = bookJson.obj.get("id").map(_.str),
+        goodreadsId = None,
         title = volumeInfo("title").str,
         subtitle = volumeInfo.get("subtitle").map(_.str),
-        authors = volumeInfo.get("authors").map(_.arr.map(_.str).toList).getOrElse(List.empty),
+        author = authors.headOption.getOrElse(""),
+        additionalAuthors = if authors.tail.nonEmpty then Some(authors.tail) else None,
         description = volumeInfo.get("description").map(_.str),
         pageCount = volumeInfo.get("pageCount").map(_.num.toInt),
         publishedDate = publishedDate,
+        yearPublished = publishedDate.map(_.getYear.toString),
         publisher = volumeInfo.get("publisher").map(_.str),
-        isbn10 = isbn10,
-        isbn13 = isbn13,
         language = volumeInfo.get("language").map(_.str),
         categories = volumeInfo.get("categories").map(_.arr.map(_.str).toList),
-        imageLinks = imageLinksMap,
+        thumbnail = volumeInfo.get("imageLinks").flatMap(_.obj.get("thumbnail").map(_.str)),
         selfLink = bookJson.obj.get("selfLink").map(_.str),
         previewLink = volumeInfo.get("previewLink").map(_.str),
-        infoLink = volumeInfo.get("infoLink").map(_.str)
+        infoLink = volumeInfo.get("infoLink").map(_.str),
+        posterUrl = isbn13.orElse(isbn10).map(isbn => s"https://covers.openlibrary.org/b/isbn/$isbn-L.jpg")
       )
 
       Right(book)

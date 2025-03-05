@@ -62,7 +62,9 @@ case class VisualMedia(
     posterUrl: Option[String] = None,
     originCountry: Option[String] = None,
     // User preferences. Maybe think of separating these into a different model
+    dateAdded: Option[LocalDate] = Some(LocalDate.now()),
     viewStatus: Option[ViewState] = None,
+    dateViewed: Option[LocalDate] = None,
     dateRated: Option[LocalDate] = None,
     personalRating: Option[Int] = None,
 )

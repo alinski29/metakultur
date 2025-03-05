@@ -32,8 +32,10 @@ object FileWriter:
       value: LazyList[String],
       path: os.Path,
       options: WriteOptions,
-      format: Option[FileFormat] = None
+      // format: Option[FileFormat] = None
   ): Either[Throwable, File] =
-    format match
-      case Some(FileFormat.Json) => new StreamingFileWriter {}.write(value, path, options)
-      case Some(FileFormat.Csv)  => new StreamingFileWriter {}.write(value, path, options)
+    new StreamingFileWriter {}.write(value, path, options)
+  // // format match
+  //   case Some(FileFormat.Json) => new StreamingFileWriter {}.write(value, path, options)
+  //   case Some(FileFormat.Csv)  => new StreamingFileWriter {}.write(value, path, options)
+  //   case Some(FileFormat.Markdown)  => new StreamingFileWriter {}.write(value, path, options)

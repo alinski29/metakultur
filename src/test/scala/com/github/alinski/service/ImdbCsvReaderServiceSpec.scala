@@ -1,6 +1,7 @@
 package com.github.alinski.service
 
 import munit.{FunSuite, Location}
+import java.time.LocalDate
 
 class ImdbCsvReaderServiceSpec extends FunSuite:
   val dataPath    = os.pwd / "src" / "test" / "resources" / "csv_files" / "imdb_export.csv"
@@ -11,6 +12,8 @@ class ImdbCsvReaderServiceSpec extends FunSuite:
     service.read(dataPath) match
       case Right(movies) =>
         assert(movies.size == 6)
+        val firstMovie = movies.head
+        assert(firstMovie.dateReleased.contains(LocalDate.of(2024, 12, 25)))
       case Left(err) =>
         fail(s"Expected file reading to succeed, but got error: $err")
   }

@@ -7,6 +7,8 @@ import java.time.LocalDate
 import java.util.concurrent.TimeUnit
 import scala.concurrent.duration.Duration
 import scala.collection.immutable.ListMap
+import com.github.alinski.model.ReadState
+import com.github.alinski.serde.ParsingUtils.camelToKebab
 
 trait Serializer[A]:
   def serialize(value: A, format: FileFormat): String
@@ -20,20 +22,22 @@ object Serializer:
   )(using serializer: Serializer[A]): String =
     serializer.serialize(value, format)
 
-  given MovieSerializer: Serializer[VisualMedia] with
+  given VisualMediaSerializer: Serializer[VisualMedia] with
     def serialize(value: VisualMedia, format: FileFormat): String =
       format match
-        case FileFormat.Json => Json.serialize(value)
-        case FileFormat.Yaml => Yaml.serialize(value)
+        case FileFormat.Json     => Json.serialize(value)
+        case FileFormat.Yaml     => Yaml.serialize(value)
+        case FileFormat.Markdown => Markdown.serialize(value)
 //         case FileFormat.MarkdownTable => MarkdownTable.serialize(value)
         case _ => Json.serialize(value)
 
   given BookSerializer: Serializer[Book] with
     def serialize(value: Book, format: FileFormat): String =
       format match
-        case FileFormat.Json => Json.serialize(value)
-        case FileFormat.Yaml => Yaml.serialize(value)
-        case _               => Json.serialize(value)
+        case FileFormat.Json     => Json.serialize(value)
+        case FileFormat.Yaml     => Yaml.serialize(value)
+        case FileFormat.Markdown => Markdown.serialize(value)
+        case _                   => Json.serialize(value)
 
   object Json:
 
@@ -94,14 +98,16 @@ object Serializer:
       given movieRW: MoviePickler.ReadWriter[VisualMedia] = MoviePickler.macroRW
 
     object BookPickler extends JsonPickler:
-      // given LocalDateReadWriter: ReadWriter[LocalDate] = readwriter[String].bimap[LocalDate](
-      //   localDate => localDate.toString,
-      //   localDateStr => LocalDate.parse(localDateStr)
-      // )
+      import com.github.alinski.serde.ParsingUtils.camelToKebab
 
       given mapReadWriter: ReadWriter[Map[String, String]] = readwriter[ujson.Obj].bimap[Map[String, String]](
         map => ujson.Obj.from(map.map { case (k, v) => (k, ujson.Str(v)) }),
         obj => obj.value.map { case (k, v) => (k, v.str) }.toMap
+      )
+
+      given ReadStateReadWriter: ReadWriter[ReadState] = readwriter[String].bimap[ReadState](
+        readState => camelToKebab(readState.toString),
+        readStateStr => ReadState.valueOf(readStateStr)
       )
 
       given bookRW: BookPickler.ReadWriter[Book] = BookPickler.macroRW
@@ -111,8 +117,9 @@ object Serializer:
 
     def serialize(movie: VisualMedia): String =
       val renames = Map(
-        "runtime"    -> "runtime_mins",
-        "poster_url" -> "cover"
+        "runtime"     -> "runtime_minutes",
+        "poster_url"  -> "cover",
+        "view_status" -> "status",
       )
       valueToMap(movie, renames)
         .map { case (k, v) => s"${k}: $v" }
@@ -131,11 +138,10 @@ object Serializer:
       case m: VisualMediaType      => convertToString(camelToKebab(m.toString).toLowerCase)
       case inst: java.time.Instant => inst.toString
       case xs: List[_]             => xs.map(convertToString).mkString("[", ", ", "]")
-      case m: Map[_, _] =>
-        m.map { case (k, v) => s"${convertToString(k)}: ${convertToString(v)}" }.mkString("{", ", ", "}")
-      case None    => ""
-      case Some(v) => convertToString(v)
-      case x       => x.toString
+      case m: Map[_, _]            => m.map { case (k, v) => s"$k: ${convertToString(v)}" }.mkString("\n")
+      case None                    => ""
+      case Some(v)                 => convertToString(v)
+      case x                       => x.toString
 
     def valueToMap(
         value: Product,
@@ -148,6 +154,38 @@ object Serializer:
         }
         .filterNot { case (k, v) => v.isBlank }
       ListMap(pairs: _*)
+
+  object Markdown:
+    def serialize(movie: VisualMedia): String =
+      val renames = Map(
+        "runtime"    -> "runtime_minutes",
+        "poster_url" -> "cover"
+      )
+      serialize(Yaml.valueToMap(movie.copy(description = None), renames), movie.description, movie.posterUrl)
+
+    def serialize(book: Book): String =
+      val pairs = Yaml.valueToMap(book.copy(description = None)).map { case (k, v) =>
+        val vv = k match
+          case k if k == "read_status" => s"${camelToKebab(v)}"
+          case _                       => v
+        k -> vv
+      }
+      serialize(pairs, description = book.description, posterUrl = book.posterUrl)
+
+    def serialize(data: ListMap[String, String], description: Option[String], posterUrl: Option[String]) =
+      val yaml        = data.map { case (k, v) => s"${k}: ${v}" }.mkString("\n")
+      val renderCover = posterUrl.map(p => s"![|300](${p})").getOrElse("")
+
+      List(
+        "---",
+        yaml,
+        "---",
+        "\n",
+        renderCover,
+        "\n",
+        "## Description",
+        description.getOrElse("")
+      ).mkString("\n")
 
   object MarkdownTable:
     def serialize(rows: Seq[Seq[String]], headers: Seq[String]): String =

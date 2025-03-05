@@ -1,6 +1,7 @@
 package com.github.alinski.serde
 
 import com.github.alinski.service.ImdbCsvReaderService
+import com.github.alinski.model.Book
 import munit.{FunSuite, Location}
 
 class SerializerSpec extends FunSuite:
@@ -24,15 +25,3 @@ class SerializerSpec extends FunSuite:
       case Left(err) =>
         fail(s"Expected file reading to succeed, but got error: $err")
   }
-
-  // test("should correctly serialize to yaml") {}
-
-  // test("should correctly write to file with with json") {}
-
-  // test("should correctly write to file with default format when no format is provided") {}
-
-  // test("should correctly infer the file format from the file extension") {}
-
-  // test("should fail to write in case the file already exists") {}
-
-  // test("should overwrite the file if the overwrite flag is set") {}

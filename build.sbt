@@ -9,7 +9,7 @@ lazy val root = (project in file("."))
   .enablePlugins(ScalaNativePlugin)
   .settings(
     Compile / mainClass := Some(s"com.github.alinski.MetakulturApp"),
-    scalafmtOnCompile := true,
+    scalafmtOnCompile   := true,
     scalacOptions ++= Seq("-explain", "-Wunused:imports", "-Wunused:locals", "-Wunused:params", "-Wunused:linted"),
     libraryDependencies ++= Seq(
       "com.github.alexarchambault"    %% "case-app_native0.5"        % "2.1.0-M30",
@@ -28,7 +28,7 @@ import scala.scalanative.build._
 
 // defaults set with common options shown
 nativeConfig ~= { c =>
-  c.withLTO(LTO.none)           // thin
-    .withMode(Mode.releaseSize) // releaseFast
-    .withGC(GC.immix)           // commix
+  c.withLTO(LTO.thin)
+    .withMode(Mode.releaseSize)
+    .withGC(GC.immix)
 }

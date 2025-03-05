@@ -18,12 +18,12 @@ class BookApiServiceSpec extends FunSuite:
       case Right(book) =>
         println(book)
         assert(book.title == "The Stranger")
-        assert(book.authors == List("Albert Camus"))
+        assert(book.author == "Albert Camus")
         assert(book.language.contains("en"))
         assert(book.publisher.contains("Knopf"))
         assert(book.pageCount.contains(148))
-        assert(book.googleId == "35VcAAAAMAAJ")
-        assert(book.imageLinks.nonEmpty)
+        assert(book.googleId.contains("35VcAAAAMAAJ"))
+      // assert(book.imageLinks.nonEmpty)
 
       case Left(err) =>
         fail(s"Expected retrieval to succeed, but got error: $err")
@@ -33,12 +33,12 @@ class BookApiServiceSpec extends FunSuite:
     bookService.getById(bookId) match
       case Right(book) =>
         assert(book.title == "The Stranger")
-        assert(book.authors == List("Albert Camus"))
+        assert(book.author == "Albert Camus")
         assert(book.language.contains("en"))
         assert(book.publisher.contains("Knopf"))
         assert(book.pageCount.contains(148))
-        assert(book.googleId == "35VcAAAAMAAJ")
-        assert(book.imageLinks.nonEmpty)
+        assert(book.googleId.contains("35VcAAAAMAAJ"))
+      // assert(book.imageLinks.nonEmpty)
 
       case Left(err) =>
         fail(s"Expected retrieval to succeed, but got error: $err")
@@ -49,8 +49,8 @@ class BookApiServiceSpec extends FunSuite:
       case Right(books) =>
         assert(books.nonEmpty)
         assert(books.head.title == "The Stranger")
-        assert(books.head.googleId == "35VcAAAAMAAJ")
-        assert(books.head.authors == List("Albert Camus"))
+        assert(books.head.googleId.contains("35VcAAAAMAAJ"))
+        assert(books.head.author == "Albert Camus")
         assert(books.head.publisher.contains("Knopf"))
       case Left(err) =>
         fail(s"Expected book search to succeed, but got error: $err")

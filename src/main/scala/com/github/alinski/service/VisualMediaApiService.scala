@@ -66,12 +66,6 @@ trait VisualMediaApiService:
       case VisualMediaType.Unknown if record.hasFields(Seq("title", "release_date"))  => VisualMediaType.Movie
       case VisualMediaType.Unknown if record.hasFields(Seq("name", "first_air_date")) => VisualMediaType.TVSeries
       case _                                                                          => mediaType
-    // scribe.info(s"keys: ${record.keySet.mkString(", ")}")
-    // val mediaTypeFinal =
-    //   if record.hasFields(Seq("title", "release_date")) then VisualMediaType.Movie
-    //   else if record.hasFields(Seq("name", "first_air_date")) then VisualMediaType.TVSeries
-    //   else VisualMediaType.Unknown
-    // scribe.info(s"mediaTypeFinal: $mediaTypeFinal")
 
     val genres =
       (record / "genre_ids")
