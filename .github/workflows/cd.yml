@@ -11,7 +11,7 @@ jobs:
         os: [ubuntu-latest]
         arch:
           - x86_64-linux
-          - aarch64-linux
+          # - aarch64-linux
     runs-on: ${{ matrix.os }}
 
     steps:
