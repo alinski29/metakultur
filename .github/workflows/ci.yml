@@ -50,6 +50,7 @@ jobs:
       run: |
         choco install curl
         choco install sbt
+        choco install llvm
       # vcpkg install libidn2
 
     # - name: Setup sbt launcher
