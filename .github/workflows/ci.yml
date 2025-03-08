@@ -49,7 +49,7 @@ jobs:
       if: matrix.os == 'windows-latest'
       run: |
         choco install curl llvm msys2 sbt -y
-        $env:PATH = "C:\tools\msys64\usr\bin;" + $env:PATH
+        $env:PATH += ";C:\tools\msys64\usr\bin"
         pacman -S mingw-w64-x86_64-libidn2 --noconfirm
 
     # - name: Setup sbt launcher
@@ -77,10 +77,12 @@ jobs:
       run: sbt scalafmtCheck
       if: matrix.os != 'windows-latest'
 
-    - name: Run Tes
+    - name: Run Tests
       run: |
-        echo $env:LIB
         cp C:\tools\msys64\mingw64\lib\libidn2.a C:\tools\msys64\mingw64\lib\idn2.lib
-        $env:LIB = "C:\tools\msys64\mingw64\lib;" + $env:LIB
+        $env:LIB += ";C:\tools\msys64\mingw64\lib"
+        $env:LIBPATH += ";C:\tools\msys64\mingw64\lib"
         echo $env:LIB
+        echo $env:LIBPATH
+        echo $env:PATH
         sbt clean test
