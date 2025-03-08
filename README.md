@@ -59,9 +59,9 @@ Usage: metakultur movie / metakultur tv [options]
 ## Setup
 
 ### 1. Download the binary from GitHub releases
-- [Linux](#)
-- [Mac](#)
-- [Windows](#)
+- [Linux](https://github.com/alinski29/metakultur/releases/download/v0.1.0/metakultur_x86_64-linux)
+- [Mac - Coming soon](#)
+- [Windows - Coming soon](#)
 
 ### 2. Set API keys as tokens for some features
 - `THEMOVIEDB_TOKEN` is required for `movie` and `tv` commands. [How to get a token](https://developer.themoviedb.org/docs/faq#how-do-i-apply-for-an-api-key)

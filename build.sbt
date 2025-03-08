@@ -1,12 +1,13 @@
-scalaVersion := "3.3.5" // A Long Term Support version.
+import scala.util.Properties
+
+scalaVersion := "3.3.5"
 
 organization := "com.github.alinski"
 name         := "metakultur"
-version      := "0.1.0"
 logLevel     := Level.Info
 
 lazy val root = (project in file("."))
-  .enablePlugins(ScalaNativePlugin)
+  .enablePlugins(ScalaNativePlugin, GitVersioning)
   .settings(
     Compile / mainClass := Some(s"com.github.alinski.MetakulturApp"),
     scalafmtOnCompile   := true,
@@ -23,12 +24,12 @@ lazy val root = (project in file("."))
     )
   )
 
-// import to add Scala Native options
 import scala.scalanative.build._
 
-// defaults set with common options shown
 nativeConfig ~= { c =>
-  c.withLTO(LTO.thin)
+  val target = sys.env.getOrElse("SCALA_NATIVE_TARGET", "x86_64-linux-gnu")
+  c.withTargetTriple(target)
+    .withLTO(if (Properties.isLinux) LTO.full else LTO.thin)
     .withMode(Mode.releaseSize)
-    .withGC(GC.immix)
+    .withGC(GC.none)
 }

@@ -1,48 +1,76 @@
 name: CI
 on:
   push:
-    branches:
-      - main
+    branches: [main]
+    paths-ignore:
+      - "README.md"
   pull_request:
+    branches: [main]
+    paths-ignore:
+      - "README.md"
+      - assets/*
+      - .pre-commit-config.yaml
+      - .scalafmt.conf
 
 jobs:
-  ci:
-    name: CI
-    runs-on: ubuntu-latest
+  tests:
+    name: Tests
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+    runs-on: ${{ matrix.os }}
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-    - name: Setup Java
-      uses: actions/setup-java@v4
-      with:
-        distribution: 'adopt'
-        java-version: '17'
-        cache: sbt
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: "adopt"
+          java-version: "17"
+          cache: sbt
 
-    - name: Install system dependencies
-      run: sudo apt-get update && sudo apt-get install -y libidn2-dev
+      - name: Setup Coursier
+        uses: coursier/cache-action@v6.3
 
-    - name: Setup sbt launcher
-      uses: sbt/setup-sbt@v1
-      with:
-        sbt-runner-version: 1.10.6
+      - name: Install system dependencies (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        run: sudo apt-get update && sudo apt-get install -y clang libstdc++-12-dev libidn2-dev
 
-    - name: Cache SBT Dependencies
-      uses: actions/cache@v3
-      with:
-        path: |
-          ~/.ivy2/cache
-          ~/.sbt
-        key: ${{ runner.os }}-sbt-${{ hashFiles('**/build.sbt') }}
-        restore-keys: |
-          ${{ runner.os }}-sbt-
+      - name: Install system dependencies (macOS)
+        if: matrix == 'macos-latest'
+        run: brew install libidn2 curl
 
-    - name: Format Check
-      run: sbt scalafmtCheck
+      - name: Install system dependencies (Windows)
+        if: matrix.os == 'windows-latest'
+        run: |
+          choco install curl llvm msys2 sbt -y
+          $env:PATH += ";C:\tools\msys64\usr\bin"
+          pacman -S mingw-w64-x86_64-libidn2 --noconfirm
+          cp C:\tools\msys64\mingw64\lib\libidn2.a C:\tools\msys64\mingw64\lib\idn2.lib
+          $env:LIB += ";C:\tools\msys64\mingw64\lib"
 
-    - name: Run Tests
-      run: sbt clean test
+      - name: Setup sbt Launcher
+        uses: sbt/setup-sbt@v1
+        with:
+          sbt-runner-version: 1.10.6
+
+      - name: Cache SBT Dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.ivy2/cache
+            ~/.sbt
+          key: ${{ runner.os }}-sbt-${{ hashFiles('**/build.sbt') }}
+          restore-keys: |
+            ${{ runner.os }}-sbt-
+
+      - name: Format Check
+        run: sbt scalafmtCheck
+        if: matrix.os.name != 'windows-latest'
+
+      - name: Run Tests
+        run: sbt clean test

@@ -6,38 +6,69 @@ on:
 
 jobs:
   build-and-release:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        arch:
+          - x86_64-linux
+          # - arm64-apple-darwin
+          # - aarch64-linux
+    runs-on: ${{ matrix.os }}
 
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-    - name: Setup Java
-      uses: actions/setup-java@v4
-      with:
-        distribution: 'adopt'
-        java-version: '17'
-        cache: sbt
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: "adopt"
+          java-version: "17"
+          cache: sbt
 
-    - name: Setup sbt Launcher
-      uses: sbt/setup-sbt@v1
-      with:
-        sbt-runner-version: 1.10.6
+      - name: Setup Coursier
+        uses: coursier/cache-action@v6.3
 
-    - name: Build Binary
-      run: sbt nativeLink
+      - name: Install system dependencies (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        run: sudo apt-get update && sudo apt-get install -y curl libcurl4-openssl-dev clang libstdc++-12-dev libidn2-dev
 
-    - name: Upload Binary Artifact
-      uses: actions/upload-artifact@v3
-      with:
-        name: metakultur-binary
-        path: target/scala-3.3.5/metakultur
+      - name: Install system dependencies (macOS)
+        if: matrix.os == 'macos-latest'
+        run: brew install libidn2 curl
 
-    - name: Create GitHub Release
-      uses: softprops/action-gh-release@v1
-      with:
-        files: target/scala-3.3.5/metakultur
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Install system dependencies (Windows)
+        if: matrix.os == 'windows-latest'
+        run: |
+          choco install curl llvm msys2 sbt -y
+          $env:PATH += ";C:\tools\msys64\usr\bin"
+          pacman -S mingw-w64-x86_64-libidn2 --noconfirm
+          cp C:\tools\msys64\mingw64\lib\libidn2.a C:\tools\msys64\mingw64\lib\idn2.lib
+          $env:LIB += ";C:\tools\msys64\mingw64\lib"
+
+      - name: Setup sbt Launcher
+        uses: sbt/setup-sbt@v1
+        with:
+          sbt-runner-version: 1.10.6
+
+      - name: Build Binary
+        run: |
+          sbt nativeLink
+          mv target/scala-3.3.5/metakultur target/scala-3.3.5/metakultur_${{ matrix.arch }}
+        env:
+          SCALA_NATIVE_TARGET: "${{ matrix.arch }}"
+
+      - name: Upload Binary Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: metakultur-binary_${{ matrix.arch }}
+          path: target/scala-3.3.5/metakultur_${{ matrix.arch }}
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: target/scala-3.3.5/metakultur_${{ matrix.arch }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.METAKULTUR_GITHUB_TOKEN }}
