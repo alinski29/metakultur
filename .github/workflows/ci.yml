@@ -52,7 +52,8 @@ jobs:
         choco install sbt
         choco install llvm
         choco install msys2
-        pacman -S mingw-w64-x86_64-libidn2
+        $env:PATH = "C:\tools\msys64\usr\bin;" + $env:PATH
+        pacman -S mingw-w64-x86_64-libidn2 --noconfirm
       # vcpkg install libidn2
 
     # - name: Setup sbt launcher
