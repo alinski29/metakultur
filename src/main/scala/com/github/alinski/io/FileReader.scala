@@ -11,7 +11,7 @@ trait CsvReader[T] extends FileReader[T]:
 
   def parse(line: Seq[String], header: Map[String, Int]): Either[Exception, T]
 
-  def parseLine(line: String, columnMapping: Map[String, Int]): Either[Exception, T] =
+  private def parseLine(line: String, columnMapping: Map[String, Int]): Either[Exception, T] =
     CSVParser.parse(line) match
       case Left(error) =>
         Left(new Exception(s"Error parsing line: $line, error: $error"))

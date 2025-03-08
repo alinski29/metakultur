@@ -7,7 +7,7 @@ enum ViewState:
   case Viewed, Whishlist
 
 enum VisualMediaType:
-  case Movie, TVSeries, Unknown
+  case Movie, TvSeries, Unknown
 
 enum VisualMediaGenre(val id: Int):
   case Action         extends VisualMediaGenre(28)

@@ -1,14 +1,12 @@
 package com.github.alinski.service
 
 import com.github.alinski.io.{ApiClient, CollectionEndpoint, JsonEndpoint, SingleResourceEndpoint}
-import com.github.alinski.service.GoogleBooksApiClient.{baseUri, defaultHeaders}
+import com.github.alinski.service.GoogleBooksApiClient.baseUri
 import com.github.alinski.model.Book
 import munit.FunSuite
 import sttp.client4.Response
 import sttp.model.Uri.UriContext
 import sttp.model.*
-
-import java.time.LocalDate
 
 class BookApiServiceSpec extends FunSuite:
   import BookApiServiceSpec.*

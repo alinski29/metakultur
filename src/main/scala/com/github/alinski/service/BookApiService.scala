@@ -8,7 +8,6 @@ import sttp.model.Uri.PathSegment
 import upickle.default.*
 
 import java.time.LocalDate
-import scala.util.{Failure, Success, Try}
 
 object BookApiService:
   lazy private val getBookByIdEndpoint: SingleResourceEndpoint = new JsonEndpoint with SingleResourceEndpoint:
@@ -22,10 +21,14 @@ object BookApiService:
   lazy private val getBookByIsbnEndpoint: SingleResourceEndpoint = new JsonEndpoint with SingleResourceEndpoint:
     override def apiClient: ApiClient[Book] = GoogleBooksApiClient
     override def fetchById(isbn: String): Either[Response[String], Response[ujson.Value]] =
+      val qpMap = Map("q" -> s"isbn:$isbn")
+      // TODO: Make a config or file with constants
+      val queryParams =
+        QueryParams.fromMap(sys.env.get("GOOGLE_BOOKS_API_KEY").map(v => qpMap + ("key" -> v)).getOrElse(qpMap))
       getResponse(
         endpoint = apiClient.baseUri,
         pathSegments = List("volumes").map(PathSegment(_)),
-        queryParams = QueryParams.fromMap(Map("q" -> s"isbn:$isbn"))
+        queryParams = queryParams
       )
 
   lazy private val searchBooksEndpoint: CollectionEndpoint = new JsonEndpoint with CollectionEndpoint:
@@ -34,10 +37,11 @@ object BookApiService:
         query: String,
         limit: Option[Int] = None
     ): Either[Response[String], Response[ujson.Value]] =
-      val queryParams = limit match
-        case Some(n) => QueryParams.fromMap(Map("q" -> query, "maxResults" -> n.toString))
-        case None    => QueryParams.fromMap(Map("q" -> query))
-
+      val qpMap = limit match
+        case Some(n) => Map("q" -> query, "maxResults" -> n.toString)
+        case None    => Map("q" -> query)
+      val queryParams =
+        QueryParams.fromMap(sys.env.get("GOOGLE_BOOKS_API_KEY").map(v => qpMap + ("key" -> v)).getOrElse(qpMap))
       getResponse(
         endpoint = apiClient.baseUri,
         pathSegments = List("volumes").map(PathSegment(_)),

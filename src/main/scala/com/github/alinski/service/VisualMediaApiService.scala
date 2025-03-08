@@ -31,7 +31,7 @@ trait VisualMediaApiService:
   def search(query: String, limit: Int = 10): Either[Exception, LazyList[VisualMedia]] =
     searchEndpoint.search(query) match
       case Left(err) =>
-        Left(ujson.ParseException("Invalid ujson.Value response", 0))
+        Left(ujson.ParseException(s"Invalid ujson.Value response, body: ${err.body}", 0))
       case Right(response: Response[ujson.Value]) =>
         response.body.obj.get("results") match
           case None =>
@@ -64,7 +64,7 @@ trait VisualMediaApiService:
 
     val mediaTypeFinal = mediaType match
       case VisualMediaType.Unknown if record.hasFields(Seq("title", "release_date"))  => VisualMediaType.Movie
-      case VisualMediaType.Unknown if record.hasFields(Seq("name", "first_air_date")) => VisualMediaType.TVSeries
+      case VisualMediaType.Unknown if record.hasFields(Seq("name", "first_air_date")) => VisualMediaType.TvSeries
       case _                                                                          => mediaType
 
     val genres =
@@ -112,7 +112,7 @@ trait VisualMediaApiService:
 
         val maybeMediaType =
           if (obj / "movie_results").exists(_.arr.nonEmpty) then Some(VisualMediaType.Movie)
-          else if (obj / "tv_results").exists(_.arr.nonEmpty) then Some(VisualMediaType.TVSeries)
+          else if (obj / "tv_results").exists(_.arr.nonEmpty) then Some(VisualMediaType.TvSeries)
           else None
 
         if maybeMediaType.isEmpty

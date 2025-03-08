@@ -1,7 +1,6 @@
 package com.github.alinski.serde
 
 import com.github.alinski.service.ImdbCsvReaderService
-import com.github.alinski.model.Book
 import munit.{FunSuite, Location}
 
 class SerializerSpec extends FunSuite:

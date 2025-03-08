@@ -46,7 +46,6 @@ trait VisualMediaCommand extends Command[VisualMediaOptions]:
       then maybeMedia.map(_.map(collectUserPreferences))
       else maybeMedia
 
-    // Handle error cases with better messaging
     moviesWithPreferences match
       case Left(err) if err.getMessage.contains("No items found") || err.getMessage.contains("Empty items") =>
         println(s"No movie found for id: ${options.imdbId.getOrElse("")}")
@@ -60,14 +59,9 @@ trait VisualMediaCommand extends Command[VisualMediaOptions]:
 
     val writeOpts = WriteOptions.default
     val maybePath = options.shared.output.map(os.Path(_))
-    maybePath.foreach { path =>
-      if !path.toIO.exists() && writeOpts.makeDirs
-      then os.makeDir.all(path)
-      else if !path.toIO.exists() && !writeOpts.makeDirs then
-        throw IllegalArgumentException(s"Path $path does not exist and makeDirs is set to false")
-    }
+    maybePath.foreach { path => setupDirectoriesIfNeeded(path, writeOpts) }
 
-    val format = Helpers.resolveOutputFormat(options.shared.outputFormat, options.shared.output)
+    val format = resolveOutputFormat(options.shared.outputFormat, options.shared.output)
     val movies = moviesWithPreferences.getOrElse(LazyList.empty[VisualMedia])
 
     maybePath match
@@ -81,7 +75,7 @@ trait VisualMediaCommand extends Command[VisualMediaOptions]:
             case Right(file) =>
               scribe.info(s"Written to $file")
             case Left(err) =>
-              scribe.error(s"Failed to write movie to ${filePath}, error: ${err.getMessage}")
+              scribe.error(s"Failed to write to $filePath, error: ${err.getMessage}")
               throw err
         }
       case Some(path) =>
@@ -90,7 +84,7 @@ trait VisualMediaCommand extends Command[VisualMediaOptions]:
           case Right(file) =>
             scribe.info(s"Written to $file")
           case Left(err) =>
-            scribe.error(s"Failed to write movies to file $path, error: ${err.getMessage}")
+            scribe.error(s"Failed to write to file $path, error: ${err.getMessage}")
             throw err
 
   @tailrec
@@ -104,16 +98,16 @@ trait VisualMediaCommand extends Command[VisualMediaOptions]:
       case Left(err) => Left(err)
       case Right(movies) if movies.nonEmpty =>
         val selection = promptUserToSelectMovie(movies)
-        val movie     = selection.flatMap(movie => service.getById(movie.head.tmdbId.get))
+        val media     = selection.flatMap(movie => service.getById(movie.head.tmdbId.get))
         // Apply user preferences if rate is enabled
-        if rate && movie.isRight then movie.map(m => LazyList(collectUserPreferences(m)))
-        else movie.map(LazyList(_))
+        if rate && media.isRight then media.map(m => LazyList(collectUserPreferences(m)))
+        else media.map(LazyList(_))
       case Right(movies) =>
         println(s"No results found for your search query: '$query'. Enter a new query or press Ctrl+C to exit")
         val newQuery = scala.io.StdIn.readLine()
         userPromptInteraction(service, newQuery, limit)
 
-  protected def promptUserToSelectMovie(movies: LazyList[VisualMedia]): Either[Exception, LazyList[VisualMedia]] =
+  private def promptUserToSelectMovie(movies: LazyList[VisualMedia]): Either[Exception, LazyList[VisualMedia]] =
     if movies.isEmpty then return Left(Exception("No movies found"))
     println("Select a movie by its index: \n")
 
@@ -146,7 +140,9 @@ trait VisualMediaCommand extends Command[VisualMediaOptions]:
         Left(Exception("Invalid input"))
 
   private def collectUserPreferences(media: VisualMedia): VisualMedia =
-    println(s"What's the view status of ${media.title} (${media.year}) ?")
+    val renderName = media.title + media.year.fold("")(" (" + _ + ")")
+
+    println(s"What's the view status of $renderName ?")
     println("1. I've seen it already")
     println("2. I'd like to see it (wishlist)")
 
@@ -165,9 +161,7 @@ trait VisualMediaCommand extends Command[VisualMediaOptions]:
         ViewState.Whishlist
 
     val (dateViewed, personalRating) = if viewStatus == ViewState.Viewed then
-      println(
-        s"When have you seen ${media.title} (${media.year}) ? Enter a date in format yyyy-MM-dd or leave blank."
-      )
+      println(s"When have you seen $renderName ? Enter a date in format yyyy-MM-dd or leave blank.")
       val dateStr = scala.io.StdIn.readLine().trim
       val date =
         if dateStr.isEmpty then None
@@ -178,7 +172,7 @@ trait VisualMediaCommand extends Command[VisualMediaOptions]:
               println("Invalid date format, using today's date")
               Some(LocalDate.now())
 
-      println(s"Rate ${media.title} (${media.year}) series on a scale from 1 to 10")
+      println(s"Rate $renderName on a scale from 1 to 10")
       val rating =
         try
           val r = scala.io.StdIn.readInt()

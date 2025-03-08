@@ -39,8 +39,8 @@ object ImdbCsvReaderService extends CsvReader[VisualMedia]:
         originalTitle = getRow(line, "Original Title"),
         `type` = getRow(line, "Title Type") match {
           case Some("Movie")          => VisualMediaType.Movie
-          case Some("TV Series")      => VisualMediaType.TVSeries
-          case Some("TV Mini Series") => VisualMediaType.TVSeries
+          case Some("TV Series")      => VisualMediaType.TvSeries
+          case Some("TV Mini Series") => VisualMediaType.TvSeries
           case _                      => VisualMediaType.Movie
         },
         imdbRating = getRow(line, "IMDb Rating").flatMap(_.toDoubleOption.map(_.toFloat)),

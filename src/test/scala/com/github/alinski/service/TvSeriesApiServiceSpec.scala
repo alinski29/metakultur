@@ -14,7 +14,7 @@ class TvSeriesApiServiceSpec extends FunSuite:
   test("TV series retrieval by imdb id, 200 response") {
     tvService.getByImdbId(tvSeriesImdbId) match
       case Right(movie) =>
-        assert(movie.`type` == VisualMediaType.TVSeries)
+        assert(movie.`type` == VisualMediaType.TvSeries)
         assert(movie.title == "The Last of Us")
         assert(movie.originalLanguage.contains("en"))
         assert(movie.dateReleased.contains(java.time.LocalDate.of(2023, 1, 15)))
@@ -29,7 +29,7 @@ class TvSeriesApiServiceSpec extends FunSuite:
   test("TV Series retrieval by tmdb id") {
     tvService.getById(tvSeriesTmdbId) match
       case Right(movie) =>
-        assert(movie.`type` == VisualMediaType.TVSeries)
+        assert(movie.`type` == VisualMediaType.TvSeries)
         assert(movie.title == "The Last of Us")
         assert(movie.originalLanguage.contains("en"))
         assert(movie.dateReleased.contains(java.time.LocalDate.of(2023, 1, 15)))
@@ -48,7 +48,7 @@ class TvSeriesApiServiceSpec extends FunSuite:
         assert(movies.size == 3)
         assert(movies.head.title == "The Last of Us")
         assert(movies.head.tmdbId.contains(tvSeriesTmdbId))
-        assert(movies.head.`type` == VisualMediaType.TVSeries)
+        assert(movies.head.`type` == VisualMediaType.TvSeries)
       case Left(err) =>
         fail(s"Expected TV series search to succeed, but got error: $err")
   }

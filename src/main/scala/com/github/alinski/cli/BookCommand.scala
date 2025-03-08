@@ -51,12 +51,7 @@ object BookCommand extends Command[BookOptions]:
 
     val writeOpts = WriteOptions.default
     val maybePath = options.shared.output.map(os.Path(_))
-    maybePath.foreach { path =>
-      if !path.toIO.exists() && writeOpts.makeDirs
-      then os.makeDir.all(path)
-      else if !path.toIO.exists() && !writeOpts.makeDirs then
-        throw IllegalArgumentException(s"Path $path does not exist and makeDirs is set to false")
-    }
+    maybePath.foreach { path => setupDirectoriesIfNeeded(path, writeOpts) }
 
     val books  = maybeBooksWithPreferences.getOrElse(LazyList.empty[Book])
     val format = resolveOutputFormat(options.shared.outputFormat, options.shared.output)
@@ -64,7 +59,7 @@ object BookCommand extends Command[BookOptions]:
     maybePath match
       case None =>
         books.foreach(book => println(Serializer.serialize(book, format)))
-      case Some(path) if path.ext.isBlank =>
+      case Some(path) if path.toIO.isDirectory =>
         books.foreach { book =>
           val filePath = path / createValidFileName(book.title, format.toString)
           val output   = Serializer.serialize(book, format)
@@ -72,7 +67,7 @@ object BookCommand extends Command[BookOptions]:
             case Right(file) =>
               scribe.info(s"Written to $file")
             case Left(err) =>
-              scribe.error(s"Failed to write book to ${filePath}, error: ${err.getMessage}")
+              scribe.error(s"Failed to write to ${filePath}, error: ${err.getMessage}")
               throw err
         }
       case Some(path) =>
@@ -81,7 +76,7 @@ object BookCommand extends Command[BookOptions]:
           case Right(file) =>
             scribe.info(s"Written to $file")
           case Left(err) =>
-            scribe.error(s"Failed to write books to file $path, error: ${err.getMessage}")
+            scribe.error(s"Failed to write to ${path}, error: ${err.getMessage}")
             throw err
 
   private def buildSearchQuery(options: BookOptions, args: RemainingArgs): Option[String] =
@@ -151,8 +146,9 @@ object BookCommand extends Command[BookOptions]:
         println("Invalid choice, defaulting to wishlist")
         ReadState.Wishlist
 
+    val renderName = s"${book.title} by ${book.author}"
     val (dateRead, personalRating) = if readStatus == ReadState.Read then
-      println("When have you finished reading this book? Enter a date in format yyyy-MM-dd or leave blank.")
+      println(s"When have you finished reading $renderName? Enter a date in format yyyy-MM-dd or leave blank.")
       val dateStr = scala.io.StdIn.readLine().trim
       val date =
         if dateStr.isEmpty then None

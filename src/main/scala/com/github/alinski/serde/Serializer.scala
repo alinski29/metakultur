@@ -47,7 +47,7 @@ object Serializer:
     def serialize(book: Book): String =
       BookPickler.write(book)
 
-    trait JsonPickler extends upickle.AttributeTagged:
+    private trait JsonPickler extends upickle.AttributeTagged:
       import com.github.alinski.serde.ParsingUtils.{camelToSnake, snakeToCamel}
 
       override def objectAttributeKeyReadMap(s: CharSequence): CharSequence =
@@ -65,7 +65,7 @@ object Serializer:
         localDateStr => LocalDate.parse(localDateStr)
       )
 
-    object MoviePickler extends JsonPickler:
+    private object MoviePickler extends JsonPickler:
       override def objectAttributeKeyWriteMap(s: CharSequence): CharSequence =
         super.objectAttributeKeyWriteMap(s) match
           case "runtime" => "runtime_mins"
@@ -97,7 +97,7 @@ object Serializer:
 
       given movieRW: MoviePickler.ReadWriter[VisualMedia] = MoviePickler.macroRW
 
-    object BookPickler extends JsonPickler:
+    private object BookPickler extends JsonPickler:
       import com.github.alinski.serde.ParsingUtils.camelToKebab
 
       given mapReadWriter: ReadWriter[Map[String, String]] = readwriter[ujson.Obj].bimap[Map[String, String]](
@@ -122,26 +122,29 @@ object Serializer:
         "view_status" -> "status",
       )
       valueToMap(movie, renames)
-        .map { case (k, v) => s"${k}: $v" }
+        .map { case (k, v) => s"$k: $v" }
         .mkString("\n")
 
     def serialize(book: Book): String =
       valueToMap(book)
-        .map { case (k, v) => s"${k}: $v" }
+        .map { case (k, v) => s"$k: $v" }
         .mkString("\n")
 
-    def convertToString(value: Any): String = value match
-      case s: String               => s"""\"$s\""""
-      case d: Duration             => d.toMinutes.toString
-      case ld: LocalDate           => ld.toString
-      case g: VisualMediaGenre     => convertToString(camelToKebab(g.toString).toLowerCase)
-      case m: VisualMediaType      => convertToString(camelToKebab(m.toString).toLowerCase)
-      case inst: java.time.Instant => inst.toString
-      case xs: List[_]             => xs.map(convertToString).mkString("[", ", ", "]")
-      case m: Map[_, _]            => m.map { case (k, v) => s"$k: ${convertToString(v)}" }.mkString("\n")
-      case None                    => ""
-      case Some(v)                 => convertToString(v)
-      case x                       => x.toString
+    private def convertToString(value: Any): String = value match
+      case s: String                 => s"""\"$s\""""
+      case d: Duration               => d.toMinutes.toString
+      case ld: LocalDate             => ld.toString
+      case g: VisualMediaGenre       => camelToKebab(g.toString).toLowerCase
+      case m: VisualMediaType        => camelToKebab(m.toString).toLowerCase
+      case vs: ViewState             => camelToKebab(vs.toString).toLowerCase
+      case rs: ReadState             => camelToKebab(rs.toString).toLowerCase
+      case inst: java.time.Instant   => inst.toString
+      case xs: List[_] if xs.isEmpty => ""
+      case xs: List[_]               => xs.map(convertToString).mkString("[", ", ", "]")
+      case m: Map[_, _]              => m.map { case (k, v) => s"$k: ${convertToString(v)}" }.mkString("\n")
+      case None                      => ""
+      case Some(v)                   => convertToString(v)
+      case x                         => x.toString
 
     def valueToMap(
         value: Product,
@@ -158,8 +161,7 @@ object Serializer:
   object Markdown:
     def serialize(movie: VisualMedia): String =
       val renames = Map(
-        "runtime"    -> "runtime_minutes",
-        "poster_url" -> "cover"
+        "runtime" -> "runtime_minutes",
       )
       serialize(Yaml.valueToMap(movie.copy(description = None), renames), movie.description, movie.posterUrl)
 
@@ -172,9 +174,9 @@ object Serializer:
       }
       serialize(pairs, description = book.description, posterUrl = book.posterUrl)
 
-    def serialize(data: ListMap[String, String], description: Option[String], posterUrl: Option[String]) =
-      val yaml        = data.map { case (k, v) => s"${k}: ${v}" }.mkString("\n")
-      val renderCover = posterUrl.map(p => s"![|300](${p})").getOrElse("")
+    def serialize(data: ListMap[String, String], description: Option[String], posterUrl: Option[String]): String =
+      val yaml        = data.map { case (k, v) => s"$k: $v" }.mkString("\n")
+      val renderCover = posterUrl.map(p => s"![|300]($p)").getOrElse("")
 
       List(
         "---",
