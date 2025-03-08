@@ -28,7 +28,7 @@ lazy val root = (project in file("."))
 import scala.scalanative.build._
 
 nativeConfig ~= { c =>
-  c.withLTO(LTO.full)
+  c.withLTO(LTO.none)
     .withMode(Mode.releaseSize)
     .withGC(GC.immix)
 }

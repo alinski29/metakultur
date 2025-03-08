@@ -80,9 +80,4 @@ jobs:
     - name: Run Tests
       run: |
         cp C:\tools\msys64\mingw64\lib\libidn2.a C:\tools\msys64\mingw64\lib\idn2.lib
-        $env:LIB += ";C:\tools\msys64\mingw64\lib"
-        $env:LIBPATH += ";C:\tools\msys64\mingw64\lib"
-        echo $env:LIB
-        echo $env:LIBPATH
-        echo $env:PATH
         sbt clean test
