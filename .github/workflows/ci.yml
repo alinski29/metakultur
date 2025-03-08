@@ -55,6 +55,7 @@ jobs:
 
     - name: Format Check
       run: sbt scalafmtCheck
+      if: matrix.os != 'windows-latest'
 
     - name: Run Tests
       run: sbt clean test
