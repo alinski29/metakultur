@@ -32,7 +32,7 @@ jobs:
 
     - name: Install system dependencies (Linux)
       if: matrix.os == 'ubuntu-latest'
-      run: sudo apt-get update && sudo apt-get install -y curl clang libstdc++-12-dev libidn2-dev
+      run: sudo apt-get update && sudo apt-get install -y curl libcurl4-openssl-dev clang libstdc++-12-dev libidn2-dev
 
     - name: Install system dependencies (macOS)
       if: matrix.os == 'macos-latest'
