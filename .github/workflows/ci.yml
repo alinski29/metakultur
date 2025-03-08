@@ -33,9 +33,9 @@ jobs:
 
     - name: Setup Scala CLI
       uses: VirtusLab/scala-cli-setup@main
-      with:
-        jvm: adopt:17
-        apps: sbtn bloop ammonite
+      # with:
+      #   jvm: adopt:17
+      #   apps: sbtn bloop ammonite
 
     # - name: Install system dependencies (Linux)
     #   if: matrix.os == 'ubuntu-latest'
