@@ -55,7 +55,7 @@ jobs:
         $env:PATH = "C:\tools\msys64\usr\bin;" + $env:PATH
         pacman -S mingw-w64-x86_64-libidn2 --noconfirm
         cp C:\tools\msys64\mingw64\lib\libidn2.a C:\tools\msys64\mingw64\lib\idn2.lib
-        $env:PATH = "C:\tools\msys64\mingw64\lib;" + $env:PATH
+        $env:LIB = "C:\tools\msys64\mingw64\lib;" + $env:LIB
       # vcpkg install libidn2
 
     # - name: Setup sbt launcher
@@ -83,5 +83,7 @@ jobs:
       run: sbt scalafmtCheck
       if: matrix.os != 'windows-latest'
 
-    - name: Run Tests
-      run: sbt clean test
+    - name: Run Tes
+      run: |
+        echo %LIB%
+        sbt clean test
