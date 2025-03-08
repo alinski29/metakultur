@@ -21,6 +21,9 @@ jobs:
         java-version: '17'
         cache: sbt
 
+    - name: Install system dependencies
+      run: sudo apt-get update && sudo apt-get install -y libidn2-dev
+
     - name: Setup sbt Launcher
       uses: sbt/setup-sbt@v1
       with:
@@ -30,7 +33,7 @@ jobs:
       run: sbt nativeLink
 
     - name: Upload Binary Artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: metakultur-binary
         path: target/scala-3.3.5/metakultur
@@ -40,4 +43,4 @@ jobs:
       with:
         files: target/scala-3.3.5/metakultur
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.METAKULTUR_GITHUB_TOKEN }}
