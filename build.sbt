@@ -28,7 +28,9 @@ lazy val root = (project in file("."))
 import scala.scalanative.build._
 
 nativeConfig ~= { c =>
-  c.withLTO(LTO.none)
+  val target = sys.env.getOrElse("SCALA_NATIVE_TARGET", if (Properties.isLinux) "x86_64-linux-gnu" else "default")
+  c.withTargetTriple(target)
+    .withLTO(if (Properties.isLinux) LTO.full else LTO.thin)
     .withMode(Mode.releaseSize)
     .withGC(GC.immix)
 }

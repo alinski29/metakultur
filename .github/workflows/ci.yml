@@ -10,9 +10,13 @@ jobs:
     name: CI
     strategy:
       matrix:
-        # os: [ubuntu-latest, macos-latest, windows-latest]
-        # os: [macos-latest, windows-latest]
-        os: [windows-latest]
+        os:
+          - name: ubuntu-latest
+            architecture: x86-64
+
+          - name: ubuntu-latest
+            architecture: aarch64
+
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -31,37 +35,27 @@ jobs:
     - name: Setup Coursier
       uses: coursier/cache-action@v6.3
 
-    - name: Setup Scala CLI
-      uses: VirtusLab/scala-cli-setup@main
-      # with:
-      #   jvm: adopt:17
-      #   apps: sbtn bloop ammonite
-
-    # - name: Install system dependencies (Linux)
-    #   if: matrix.os == 'ubuntu-latest'
-    #   run: sudo apt-get update && sudo apt-get install -y clang libstdc++-12-dev libidn2-dev
+    - name: Install system dependencies (Linux)
+      if: matrix.os.name == 'ubuntu-latest'
+      run: sudo apt-get update && sudo apt-get install -y clang libstdc++-12-dev libidn2-dev
 
     - name: Install system dependencies (macOS)
-      if: matrix.os == 'macos-latest'
+      if: matrix.os.name == 'macos-latest'
       run: brew install libidn2 curl
 
     - name: Install system dependencies (Windows)
-      if: matrix.os == 'windows-latest'
+      if: matrix.os.name == 'windows-latest'
       run: |
         choco install curl llvm msys2 sbt -y
         $env:PATH += ";C:\tools\msys64\usr\bin"
         pacman -S mingw-w64-x86_64-libidn2 --noconfirm
+        cp C:\tools\msys64\mingw64\lib\libidn2.a C:\tools\msys64\mingw64\lib\idn2.lib
+        $env:LIB += ";C:\tools\msys64\mingw64\lib"
 
-    # - name: Setup sbt launcher
-    #   run: |
-    #     echo "deb https://repo.scala-sbt.org/scalasbt/debian all main" | sudo tee /etc/apt/sources.list.d/sbt.list
-    #     echo "deb https://repo.scala-sbt.org/scalasbt/debian /" | sudo tee /etc/apt/sources.list.d/sbt_old.list
-    #     curl -sL "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x2EE0EA64E40A89B84B2DF73499E82A75642AC823" | sudo tee /etc/apt/trusted.gpg.d/sbt.asc
-    #     sudo apt-get  update
-    #     sudo apt-get -y install sbt
-      # uses: sbt/setup-sbt@v1
-      # with:
-      #   sbt-runner-version: 1.10.6
+    - name: Setup sbt Launcher
+      uses: sbt/setup-sbt@v1
+      with:
+        sbt-runner-version: 1.10.6
 
     - name: Cache SBT Dependencies
       uses: actions/cache@v3
@@ -75,9 +69,7 @@ jobs:
 
     - name: Format Check
       run: sbt scalafmtCheck
-      if: matrix.os != 'windows-latest'
+      if: matrix.os.name != 'windows-latest'
 
     - name: Run Tests
-      run: |
-        cp C:\tools\msys64\mingw64\lib\libidn2.a C:\tools\msys64\mingw64\lib\idn2.lib
-        sbt clean test
+      run: sbt clean test
