@@ -51,6 +51,8 @@ jobs:
         choco install curl
         choco install sbt
         choco install llvm
+        choco install msys2
+        pacman -S mingw-w64-x86_64-libidn2
       # vcpkg install libidn2
 
     # - name: Setup sbt launcher
