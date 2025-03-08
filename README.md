@@ -1,31 +1,87 @@
-# Metakultur
+# metakultur
 
-Metakultur is a CLI application written in Scala 3 native that fetches metadata about cultural events from web APIs. It currently supports books and movies, with plans to expand to concerts, craft beer, theater plays, and more.
+Metakultur is a CLI application written in Scala 3 that fetches metadata about cultural events from web APIs. It supports books, movies, and TV shows, with plans to expand to other events such as concerts, craft beer, theater plays, and more. It integrates nicely with Obsidian's Dataview plugin, exporting resources into markdown with frontmatter or YAML.
 
-## Description
+## Table of Contents
+- [Demo](#demo)
+- [Main Features](#main-features)
+- [Usage](#usage)
+- [Setup](#setup)
+- [Obsidian Dataview Integration](#obsidian-dataview-integration)
 
-Metakultur is designed to be an extensible and flexible tool for fetching and processing metadata about various cultural resources. The application supports multiple output formats and can read from different data sources, making it a versatile solution for managing cultural event data.
+## Demo
+
+<img src="./assets/demo.gif" alt="Demo" width="700"/>
 
 ## Main Features
 
-- Fetch resource by ID from API
-- Search resource with user query, give top n results to the user to choose 1, then fetch the resource by ID
-- For books: read from an IMDB CSV file export, parse and convert it to the application format
-- For movies: read from a Goodreads CSV file export, parse the content and convert it to the application format
-- Support multiple output formats: console (default), JSON, YAML, and CSV, with an option like `-o` or `--output`
+- Fetch resources by various IDs from APIs
+- Search for resources using user queries
+- Import data from IMDB or Goodreads dumps
+- Support multiple output formats: console (default), JSON, YAML, markdown
 
 ## Usage
 
 ```bash
-metakultur movie --id <id>
-metakultur movie <search query>
-metakultur movie --imdb-csv-file <path-to-csv-file>
+Usage: metakultur <COMMAND>
 
-metakultur tv --id <id>
-metakultur tv <search query>
-metakultur tv --imdb-csv-file <path-to-csv-file>
+Commands:
+  book
+  movie
+  tv
 
-metakultur book --id <id>
-metakultur book search <search query>
-metakultur book --goodreads-csv-file <path-to-csv-file>
+Common [options]:
+  --usage                       Print usage and exit
+  -h, -help, --help             Print help message and exit
+  -f, --output-format string?   One of: json, yaml, md. (default: json)
+  -o, --output string?          Path to output file
+  -r, --rate                    Add personal rating details (default: false)
+
+IMDB and Goodreads CSV import [options]:
+  --from string?                Filter the CSV with records starting from this date (yyyy-MM-dd)
+  --to string?                  Filter the CSV with records up to this date (yyyy-MM-dd)
+  --enrich                      Enrich the CSV file with additional details from API (may require an API key)
+
+Usage: metakultur book [options]
+  --isbn string?                Book ISBN13 or ISBN10
+  --title string?               Book title to search for
+  --author string?              Book author to search for
+  --goodreads-csv-file string?  Path to CSV export from Goodreads
+  -n, --limit int               Max search results returned (default: 5)
+
+Usage: metakultur movie / metakultur tv [options]
+  --imdb-id string?             IMDB ID
+  --tmdb-id string?             TMDB (The Movie Database) ID
+  --imdb-csv-file string?       Path to CSV export from IMDB
+  -n, --limit int               Max search results returned (default: 5)
 ```
+
+## Setup
+
+### 1. Download the binary from GitHub releases
+- [Linux](#)
+- [Mac](#)
+- [Windows](#)
+
+### 2. Set API keys as tokens for some features
+- `THEMOVIEDB_TOKEN` is required for `movie` and `tv` commands. [How to get a token](https://developer.themoviedb.org/docs/faq#how-do-i-apply-for-an-api-key)
+- `GOOGLE_BOOKS_TOKEN` is optional for `book` command but provides higher limits. [How to get a token](https://developers.google.com/books/docs/v1/getting_started)
+
+## Obsidian Dataview Integration
+
+Metakultur integrates with [Obsidian's Dataview plugin](https://blacksmithgu.github.io/obsidian-dataview/). Export data in markdown format, e.g., `metakultur movie --imdb-id tt4772188 -f md -o $PWD`: the file name will be generated from the movie title (e.g., Flow.md). This writes data properties as YAML in the frontmatter, which Obsidian's Dataview plugin uses for querying and creating tables.
+
+Example dataview query in Obsidian:
+```dataview
+TABLE title, year, personal_rating
+FROM "Movies"
+WHERE type = "movie" AND view_state = "viewed"
+SORT date_viewed DESC
+```
+
+For advanced queries and rendering options, check out the [JavaScript DSL](https://blacksmithgu.github.io/obsidian-dataview/api/intro/).
+
+This is how my current Dataview query for movies renders in Obsidian.
+<p align="left">
+  <img src="./assets/movies_dataview_showcase.png" alt="Movies Dataview Showcase" width="700"/>
+</p>
