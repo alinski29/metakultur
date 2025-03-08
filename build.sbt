@@ -1,3 +1,5 @@
+import scala.util.Properties
+
 scalaVersion := "3.3.5"
 
 organization := "com.github.alinski"
@@ -19,13 +21,14 @@ lazy val root = (project in file("."))
       "io.github.cquiroz"             %% "scala-java-time_native0.5" % "2.6.0",
       "com.softwaremill.sttp.client4" %% "core_native0.5"            % "4.0.0-RC1",
       "org.scalameta"                 %% "munit_native0.5"           % "1.1.0" % Test
-    )
+    ),
+    // nativeLinkOutput := file("target/scala-3.3.5/metakultur/metakultur")
   )
 
 import scala.scalanative.build._
 
 nativeConfig ~= { c =>
-  c.withLTO(LTO.thin)
+  c.withLTO(LTO.full)
     .withMode(Mode.releaseSize)
     .withGC(GC.immix)
 }
