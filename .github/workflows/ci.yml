@@ -55,6 +55,7 @@ jobs:
         $env:PATH = "C:\tools\msys64\usr\bin;" + $env:PATH
         pacman -S mingw-w64-x86_64-libidn2 --noconfirm
         cp C:\tools\msys64\mingw64\lib\libidn2.a C:\tools\msys64\mingw64\lib\idn2.lib
+        $env:PATH = "C:\tools\msys64\mingw64\lib;" + $env:PATH
       # vcpkg install libidn2
 
     # - name: Setup sbt launcher
