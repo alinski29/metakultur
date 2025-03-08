@@ -48,15 +48,9 @@ jobs:
     - name: Install system dependencies (Windows)
       if: matrix.os == 'windows-latest'
       run: |
-        choco install curl
-        choco install sbt
-        choco install llvm
-        choco install msys2
+        choco install curl llvm msys2 sbt -y
         $env:PATH = "C:\tools\msys64\usr\bin;" + $env:PATH
         pacman -S mingw-w64-x86_64-libidn2 --noconfirm
-        cp C:\tools\msys64\mingw64\lib\libidn2.a C:\tools\msys64\mingw64\lib\idn2.lib
-        $env:LIB = "C:\tools\msys64\mingw64\lib;" + $env:LIB
-      # vcpkg install libidn2
 
     # - name: Setup sbt launcher
     #   run: |
@@ -85,5 +79,8 @@ jobs:
 
     - name: Run Tes
       run: |
-        echo %LIB%
+        echo $env:LIB
+        cp C:\tools\msys64\mingw64\lib\libidn2.a C:\tools\msys64\mingw64\lib\idn2.lib
+        $env:LIB = "C:\tools\msys64\mingw64\lib;" + $env:LIB
+        echo $env:LIB
         sbt clean test
