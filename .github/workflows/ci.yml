@@ -11,7 +11,8 @@ jobs:
     strategy:
       matrix:
         # os: [ubuntu-latest, macos-latest, windows-latest]
-        os: [macos-latest, windows-latest]
+        # os: [macos-latest, windows-latest]
+        os: [windows-latest]
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -27,9 +28,18 @@ jobs:
         java-version: '17'
         cache: sbt
 
+    - name: Setup Coursier
+      uses: coursier/cache-action@v6.3
+
+    - name: Setup Scala CLI
+      uses: VirtusLab/scala-cli-setup@main
+      with:
+        jvm: adopt:17
+        apps: sbtn bloop ammonite
+
     # - name: Install system dependencies (Linux)
     #   if: matrix.os == 'ubuntu-latest'
-    #   run: sudo apt-get update && sudo apt-get install -y libidn2-dev
+    #   run: sudo apt-get update && sudo apt-get install -y clang libstdc++-12-dev libidn2-dev
 
     - name: Install system dependencies (macOS)
       if: matrix.os == 'macos-latest'
@@ -37,9 +47,8 @@ jobs:
 
     - name: Install system dependencies (Windows)
       if: matrix.os == 'windows-latest'
-      run: |
-        choco install curl
-        vcpkg install libidn2
+      run: choco install curl
+      # vcpkg install libidn2
 
     - name: Setup sbt launcher
       uses: sbt/setup-sbt@v1
